@@ -30,7 +30,7 @@ export default function BinaryOperations() {
 
   const add = (binary1, binary2) => {
     if ((!/^[01]+$/.test(binary1) || !/^[01]+$/.test(binary2))) {
-        return { result: "Invalid binary input", steps: [], remainder: null };
+      return { result: "Invalid binary input", steps: [], remainder: null };
     }
 
     const maxLength = Math.max(binary1.length, binary2.length);
@@ -46,54 +46,58 @@ export default function BinaryOperations() {
 
     let carry = 0;
     for (let i = maxLength - 1; i >= 0; i--) {
-        const bit1 = parseInt(paddedBinary1[i], 10);
-        const bit2 = parseInt(paddedBinary2[i], 10);
-        const sum = bit1 + bit2 + carry;
+      const bit1 = parseInt(paddedBinary1[i], 10);
+      const bit2 = parseInt(paddedBinary2[i], 10);
+      const sum = bit1 + bit2 + carry;
 
-        result = (sum % 2) + result;
-        carry = Math.floor(sum / 2);
+      result = (sum % 2) + result;
+      carry = Math.floor(sum / 2);
 
-        if (carry > 0) {
-            carries[i + 1] = "1";
-        }
+      if (carry > 0) {
+        carries[i] = "1";
+      }
     }
 
-  if (carry > 0) {
+    if (carry > 0) {
       carries.unshift("1");
-  } else {
-      carries.shift(); // Remove extra space if no final carry
-  }
-  
+      carries.pop();
+    } else {
+      carries.shift();
+    }
 
     if (result.length > maxLength) {
-      result = result.slice(-maxLength);  
+      result = result.slice(-maxLength);
     } else {
-        result = result.padStart(maxLength, "0"); 
+      result = result.padStart(maxLength, "0");
     }
 
-    const carriesLine = carries.join("");
-    let finalDisplay = `${carriesLine}\n  ${paddedBinary1}\n+ ${paddedBinary2}\n${"-".repeat(maxLength + 2)}\n  ${result}`;
+    let carriesLine = carries.join("");
+    if (carry > 0) {
+      carriesLine += " (Carry out)";
+    }
+
+    let finalDisplay = `${carriesLine}\n  ${paddedBinary1} (A)\n+ ${paddedBinary2} (B)\n${"-".repeat(maxLength + 2)}\n  ${result} (Sum)`;
     steps.push(finalDisplay);
 
-    // Extract the first and last carries correctly
+
     let firstCarry = carries.find(c => c === "1") || "0";
     let lastCarry = [...carries].reverse().find(c => c === "1") || "0";
 
     let remainder = (parseInt(firstCarry, 10) ^ parseInt(lastCarry, 10)).toString();
     console.log(remainder);
 
-    setRemainderSteps(`Carry in ${firstCarry} XOR Carry out ${lastCarry}: ${remainder}`); 
+    setRemainderSteps(`Carry in ${firstCarry} XOR Carry out ${lastCarry}: ${remainder}`);
     console.log(remainderSteps);
 
     return { result, steps, remainder, remainderSteps };
-};
+  };
 
   const handleOperation = () => {
     if (!binary1 || !binary2) {
       alert("Please enter both binary numbers");
       return;
     }
-  
+
     if (!validLength(binary1) || !validLength(binary2)) {
       alert("Binary numbers must be either 6 or 8 bits long.");
       return;
@@ -205,31 +209,31 @@ export default function BinaryOperations() {
       </style>
       <div className="container">
         <div className="back-button">
-          <button 
+          <button
             onClick={() => navigate('/conversion/:type')}
             className="back-button-link"
           >
-            ← 
+            ←
           </button>
           <h2>{operation.charAt(0).toUpperCase() + operation.slice(1)}</h2>
         </div>
 
         <div className="input-container">
-          <input 
-            type="text" 
-            value={binary1} 
+          <input
+            type="text"
+            value={binary1}
             onChange={(e) => setBinary1(e.target.value)}
-            placeholder="First Binary Number"
+            placeholder="First Binary Number (6-8 bits)"
           />
-          <input 
-            type="text" 
-            value={binary2} 
+          <input
+            type="text"
+            value={binary2}
             onChange={(e) => setBinary2(e.target.value)}
             placeholder="Second Binary Number"
           />
         </div>
 
-        <button 
+        <button
           onClick={handleOperation}
           className="calculate-button"
         >
@@ -237,28 +241,28 @@ export default function BinaryOperations() {
         </button>
 
         {result && (
-        <div className="result-container">
-          <div className="result-steps">
-            <h3>Calculation Steps:</h3>
-            {steps.map((step, index) => (
-              <pre key={index} style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', margin: '8px 0' }}>
-                {step}
-              </pre>
-            ))}
-          </div>
-          <div className="result-output">
-            <h3>Result:</h3>
-            <div>{result}</div>
-          </div>
-          {remainder !== null && (
-            <div className="result-output">
-              <h3>Overflow:</h3>
-              <div>{remainderSteps}</div>
-              <div>{remainder}</div>
+          <div className="result-container">
+            <div className="result-steps">
+              <h3>Calculation Steps:</h3>
+              {steps.map((step, index) => (
+                <pre key={index} style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', margin: '8px 0' }}>
+                  {step}
+                </pre>
+              ))}
             </div>
-          )}
-        </div>
-      )}
+            <div className="result-output">
+              <h3>Result:</h3>
+              <div>{result}</div>
+            </div>
+            {remainder !== null && (
+              <div className="result-output">
+                <h3>Overflow:</h3>
+                <div>{remainderSteps}</div>
+                <div>{remainder}</div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
